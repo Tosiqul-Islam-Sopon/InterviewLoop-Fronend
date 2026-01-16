@@ -1,16 +1,22 @@
+'use client'
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Github, Linkedin, Twitter } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (pathname === "/login") return null;
   return (
-    <footer className="border-t bg-gradient-to-br from-secondary/30 via-background to-accent/10">
+    <footer className="border-t bg-linear-to-br from-secondary/30 via-background to-accent/10">
       <div className="mx-auto max-w-7xl px-4 py-10">
         {/* Top Section */}
         <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}
           <div>
-            <h2 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h2 className="text-xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
               InterviewLoop
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">

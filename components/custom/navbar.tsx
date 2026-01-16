@@ -19,8 +19,21 @@ import { ThemeToggle } from "@/components/custom/theme-toggle";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 import { rootPaths } from "@/lib/paths";
+import { useSession } from "next-auth/react";
+import { usePathname, useRouter } from "next/navigation";
+import { useLogout } from "@/hooks/useLogout";
 
 export function Navbar() {
+  const { data: session, status } = useSession();
+  const logoutMutation = useLogout();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const isAuthenticated = status === "authenticated";
+  const initials = session?.user?.email?.slice(0, 2).toUpperCase();
+
+
+  if (pathname === "/login") return null;
   return (
     <header className="border-b fixed top-0 z-50 w-full bg-linear-to-r from-background via-secondary/50 to-background backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
@@ -47,21 +60,36 @@ export function Navbar() {
         {/* Right Side */}
         <div className="hidden md:flex items-center gap-2">
           <ThemeToggle />
-          <Button variant="outline" asChild>
-            <Link href={rootPaths.login}>Login</Link>
-          </Button>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Avatar>
-                <AvatarFallback>TI</AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Profile</DropdownMenuItem>
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {status === "loading" ? null : !isAuthenticated ? (
+            <Button variant="outline" asChild>
+              <Link href={rootPaths.login}>Login</Link>
+            </Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="outline-none">
+                <Avatar>
+                  <AvatarFallback>{initials}</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link href="/profile">Profile</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={() =>
+                    logoutMutation.mutate(undefined, {
+                      onSuccess: () => router.push("/"),
+                    })
+                  }
+                >
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         {/* Mobile Menu */}
@@ -75,9 +103,24 @@ export function Navbar() {
               <Link href="/interviews">Interviews</Link>
               <Link href="/companies">Companies</Link>
               <Link href="/submit">Share Experience</Link>
-              <Button className="w-full" asChild>
-                <Link href="/login">Login</Link>
-              </Button>
+              {status !== "loading" &&
+                (!isAuthenticated ? (
+                  <Button className="w-full" asChild>
+                    <Link href={rootPaths.login}>Login</Link>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="destructive"
+                    className="w-full"
+                    onClick={() =>
+                      logoutMutation.mutate(undefined, {
+                        onSuccess: () => router.push("/"),
+                      })
+                    }
+                  >
+                    Logout
+                  </Button>
+                ))}
             </SheetContent>
           </Sheet>
         </div>

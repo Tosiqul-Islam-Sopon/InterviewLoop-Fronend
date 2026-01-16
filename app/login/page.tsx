@@ -9,6 +9,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { rootPaths } from "@/lib/paths";
+import { useLogin } from "@/hooks/useLogin";
+import { useRouter } from "next/navigation";
 
 type LoginFormData = {
   email: string;
@@ -24,9 +26,18 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormData>();
 
+  const loginMutation = useLogin();
+  const router = useRouter();
+
   const onSubmit = (data: LoginFormData) => {
-    console.log("Login data:", data);
-    // Handle login logic here
+    loginMutation.mutate(
+      { email: data.email, password: data.password },
+      {
+        onSuccess: () => {
+          router.push(`${rootPaths.home}`);
+        },
+      }
+    );
   };
 
   return (
@@ -121,8 +132,12 @@ export default function LoginPage() {
               </Link>
             </div>
 
-            <Button type="submit" className="w-full">
-              Sign In
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loginMutation.isPending}
+            >
+              {loginMutation.isPending ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 

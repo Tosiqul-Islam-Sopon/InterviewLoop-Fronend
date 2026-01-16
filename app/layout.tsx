@@ -4,6 +4,7 @@ import "./globals.css";
 import { Navbar } from "@/components/custom/navbar";
 import { Footer } from "@/components/custom/footer";
 import { ThemeProvider } from "next-themes";
+import Providers from "./providers"; // ✅ ADD THIS
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,9 +23,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -32,9 +33,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Navbar />
-          <main className="pt-20">{children}</main>
-          <Footer />
+          {/* ✅ CLIENT PROVIDERS */}
+          <Providers>
+            <Navbar />
+            <main className="pt-20">{children}</main>
+            <Footer />
+          </Providers>
         </ThemeProvider>
       </body>
     </html>
