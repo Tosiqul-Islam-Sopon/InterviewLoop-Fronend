@@ -41,7 +41,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-background via-secondary/20 to-accent/5 flex items-center justify-center p-4">
+    <div className="bg-linear-to-br from-background via-secondary/20 to-accent/5 flex items-center justify-center pb-10">
       <div className="w-full max-w-md">
         <div className="bg-card/80 backdrop-blur border border-border rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
@@ -154,10 +154,26 @@ export default function LoginPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <Button variant="outline" className="w-full">
+              <span>
+                <Image
+                  src="/icons/google.png"
+                  alt="google"
+                  height={25}
+                  width={25}
+                />
+              </span>
               Google
             </Button>
             <Button variant="outline" className="w-full">
-              Facebook
+              <span>
+                <Image
+                  src="/icons/github.png"
+                  alt="github"
+                  height={25}
+                  width={25}
+                />
+              </span>
+              GitHub
             </Button>
           </div>
 
