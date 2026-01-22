@@ -5,6 +5,7 @@ import { Navbar } from "@/components/custom/navbar";
 import { Footer } from "@/components/custom/footer";
 import { ThemeProvider } from "next-themes";
 import Providers from "./providers"; // ✅ ADD THIS
+import LayoutWrapper from "./layout-wrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,9 +36,9 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {/* ✅ CLIENT PROVIDERS */}
           <Providers>
-            <Navbar />
-            <main className="pt-20">{children}</main>
-            <Footer />
+            <LayoutWrapper>
+              {children}
+            </LayoutWrapper>
           </Providers>
         </ThemeProvider>
       </body>

@@ -77,6 +77,11 @@ export function Navbar() {
                 <DropdownMenuItem asChild>
                   <Link href="/profile">Profile</Link>
                 </DropdownMenuItem>
+                {session?.user?.role === 'admin' && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin">Admin Panel</Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem
                   className="text-destructive"
                   onClick={() =>
