@@ -9,7 +9,7 @@ export const useUsers = (skip = 0, limit = 100) => {
   return useQuery({
     queryKey: [USERS_KEY, { skip, limit }],
     queryFn: async (): Promise<User[]> => {
-      const { data } = await api.get(`/api/v1/users?skip=${skip}&limit=${limit}`);
+      const { data } = await api.get(`/users?skip=${skip}&limit=${limit}`);
       return data;
     },
   });
@@ -20,7 +20,7 @@ export const useUser = (userId: number) => {
   return useQuery({
     queryKey: [USERS_KEY, userId],
     queryFn: async (): Promise<User> => {
-      const { data } = await api.get(`/api/v1/users/${userId}`);
+      const { data } = await api.get(`/users/${userId}`);
       return data;
     },
     enabled: !!userId,
@@ -33,7 +33,7 @@ export const useCreateUser = () => {
   
   return useMutation({
     mutationFn: async (userData: UserCreate): Promise<User> => {
-      const { data } = await api.post('/api/v1/users', userData);
+      const { data } = await api.post('/users', userData);
       return data;
     },
     onSuccess: () => {
@@ -48,7 +48,7 @@ export const useUpdateUser = () => {
   
   return useMutation({
     mutationFn: async ({ id, ...userData }: UserUpdate & { id: number }): Promise<User> => {
-      const { data } = await api.put(`/api/v1/users/${id}`, userData);
+      const { data } = await api.put(`/users/${id}`, userData);
       return data;
     },
     onSuccess: (data) => {
@@ -64,7 +64,7 @@ export const useDeleteUser = () => {
   
   return useMutation({
     mutationFn: async (userId: number): Promise<void> => {
-      await api.delete(`/api/v1/users/${userId}`);
+      await api.delete(`/users/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [USERS_KEY] });

@@ -9,7 +9,7 @@ export const useJobRoles = (skip = 0, limit = 100) => {
   return useQuery({
     queryKey: [JOB_ROLES_KEY, { skip, limit }],
     queryFn: async (): Promise<JobRole[]> => {
-      const { data } = await api.get(`/api/v1/job-roles?skip=${skip}&limit=${limit}`);
+      const { data } = await api.get(`/job-roles?skip=${skip}&limit=${limit}`);
       return data;
     },
   });
@@ -20,7 +20,7 @@ export const useJobRole = (jobRoleId: number) => {
   return useQuery({
     queryKey: [JOB_ROLES_KEY, jobRoleId],
     queryFn: async (): Promise<JobRole> => {
-      const { data } = await api.get(`/api/v1/job-roles/${jobRoleId}`);
+      const { data } = await api.get(`/job-roles/${jobRoleId}`);
       return data;
     },
     enabled: !!jobRoleId,
@@ -33,7 +33,7 @@ export const useCreateJobRole = () => {
   
   return useMutation({
     mutationFn: async (jobRoleData: JobRoleCreate): Promise<JobRole> => {
-      const { data } = await api.post('/api/v1/job-roles', jobRoleData);
+      const { data } = await api.post('/job-roles', jobRoleData);
       return data;
     },
     onSuccess: () => {
@@ -48,7 +48,7 @@ export const useUpdateJobRole = () => {
   
   return useMutation({
     mutationFn: async ({ id, ...jobRoleData }: JobRoleUpdate & { id: number }): Promise<JobRole> => {
-      const { data } = await api.put(`/api/v1/job-roles/${id}`, jobRoleData);
+      const { data } = await api.put(`/job-roles/${id}`, jobRoleData);
       return data;
     },
     onSuccess: (data) => {
@@ -64,7 +64,7 @@ export const useDeleteJobRole = () => {
   
   return useMutation({
     mutationFn: async (jobRoleId: number): Promise<void> => {
-      await api.delete(`/api/v1/job-roles/${jobRoleId}`);
+      await api.delete(`/job-roles/${jobRoleId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [JOB_ROLES_KEY] });

@@ -9,7 +9,7 @@ export const useInterviewTypes = () => {
   return useQuery({
     queryKey: [INTERVIEW_TYPES_KEY],
     queryFn: async (): Promise<InterviewType[]> => {
-      const { data } = await api.get('/api/v1/interview-types');
+      const { data } = await api.get('/interview-types');
       return data;
     },
   });
@@ -20,7 +20,7 @@ export const useInterviewType = (interviewTypeId: number) => {
   return useQuery({
     queryKey: [INTERVIEW_TYPES_KEY, interviewTypeId],
     queryFn: async (): Promise<InterviewType> => {
-      const { data } = await api.get(`/api/v1/interview-types/${interviewTypeId}`);
+      const { data } = await api.get(`/interview-types/${interviewTypeId}`);
       return data;
     },
     enabled: !!interviewTypeId,
@@ -33,7 +33,7 @@ export const useCreateInterviewType = () => {
   
   return useMutation({
     mutationFn: async (interviewTypeData: InterviewTypeCreate): Promise<InterviewType> => {
-      const { data } = await api.post('/api/v1/interview-types', interviewTypeData);
+      const { data } = await api.post('/interview-types', interviewTypeData);
       return data;
     },
     onSuccess: () => {
@@ -48,7 +48,7 @@ export const useUpdateInterviewType = () => {
   
   return useMutation({
     mutationFn: async ({ id, ...interviewTypeData }: InterviewTypeUpdate & { id: number }): Promise<InterviewType> => {
-      const { data } = await api.put(`/api/v1/interview-types/${id}`, interviewTypeData);
+      const { data } = await api.put(`/interview-types/${id}`, interviewTypeData);
       return data;
     },
     onSuccess: (data) => {
@@ -64,7 +64,7 @@ export const useDeleteInterviewType = () => {
   
   return useMutation({
     mutationFn: async (interviewTypeId: number): Promise<void> => {
-      await api.delete(`/api/v1/interview-types/${interviewTypeId}`);
+      await api.delete(`/interview-types/${interviewTypeId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [INTERVIEW_TYPES_KEY] });

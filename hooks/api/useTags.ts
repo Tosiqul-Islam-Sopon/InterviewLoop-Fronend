@@ -9,7 +9,7 @@ export const useTags = () => {
   return useQuery({
     queryKey: [TAGS_KEY],
     queryFn: async (): Promise<Tag[]> => {
-      const { data } = await api.get('/api/v1/tags');
+      const { data } = await api.get('/tags');
       return data;
     },
   });
@@ -20,7 +20,7 @@ export const useTag = (tagId: number) => {
   return useQuery({
     queryKey: [TAGS_KEY, tagId],
     queryFn: async (): Promise<Tag> => {
-      const { data } = await api.get(`/api/v1/tags/${tagId}`);
+      const { data } = await api.get(`/tags/${tagId}`);
       return data;
     },
     enabled: !!tagId,
@@ -33,7 +33,7 @@ export const useCreateTag = () => {
   
   return useMutation({
     mutationFn: async (tagData: TagCreate): Promise<Tag> => {
-      const { data } = await api.post('/api/v1/tags', tagData);
+      const { data } = await api.post('/tags', tagData);
       return data;
     },
     onSuccess: () => {
@@ -48,7 +48,7 @@ export const useUpdateTag = () => {
   
   return useMutation({
     mutationFn: async ({ id, ...tagData }: TagUpdate & { id: number }): Promise<Tag> => {
-      const { data } = await api.put(`/api/v1/tags/${id}`, tagData);
+      const { data } = await api.put(`/tags/${id}`, tagData);
       return data;
     },
     onSuccess: (data) => {
@@ -64,7 +64,7 @@ export const useDeleteTag = () => {
   
   return useMutation({
     mutationFn: async (tagId: number): Promise<void> => {
-      await api.delete(`/api/v1/tags/${tagId}`);
+      await api.delete(`/tags/${tagId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [TAGS_KEY] });

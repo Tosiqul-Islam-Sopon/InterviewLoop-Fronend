@@ -9,7 +9,7 @@ export const useCompanies = () => {
   return useQuery({
     queryKey: [COMPANIES_KEY],
     queryFn: async (): Promise<Company[]> => {
-      const { data } = await api.get('/api/v1/companies');
+      const { data } = await api.get('/companies');
       return data;
     },
   });
@@ -20,7 +20,7 @@ export const useCompany = (companyId: number) => {
   return useQuery({
     queryKey: [COMPANIES_KEY, companyId],
     queryFn: async (): Promise<Company> => {
-      const { data } = await api.get(`/api/v1/companies/${companyId}`);
+      const { data } = await api.get(`/companies/${companyId}`);
       return data;
     },
     enabled: !!companyId,
@@ -33,7 +33,7 @@ export const useCreateCompany = () => {
   
   return useMutation({
     mutationFn: async (companyData: CompanyCreate): Promise<Company> => {
-      const { data } = await api.post('/api/v1/companies', companyData);
+      const { data } = await api.post('/companies', companyData);
       return data;
     },
     onSuccess: () => {
@@ -48,7 +48,7 @@ export const useUpdateCompany = () => {
   
   return useMutation({
     mutationFn: async ({ id, ...companyData }: CompanyUpdate & { id: number }): Promise<Company> => {
-      const { data } = await api.patch(`/api/v1/companies/${id}`, companyData);
+      const { data } = await api.patch(`/companies/${id}`, companyData);
       return data;
     },
     onSuccess: (data) => {
@@ -64,7 +64,7 @@ export const useDeleteCompany = () => {
   
   return useMutation({
     mutationFn: async (companyId: number): Promise<void> => {
-      await api.delete(`/api/v1/companies/${companyId}`);
+      await api.delete(`/companies/${companyId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [COMPANIES_KEY] });
