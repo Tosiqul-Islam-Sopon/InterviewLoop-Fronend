@@ -12,7 +12,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useCreateInterviewType, useInterviewTypes } from '@/hooks/api'
+import {
+  useCreateInterviewType,
+  useDeleteInterviewType,
+  useInterviewTypes,
+  useUpdateInterviewType,
+} from '@/hooks/api'
 import {
   Dialog,
   DialogContent,
@@ -23,17 +28,39 @@ import {
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
-import { InterviewType, InterviewTypeCreate } from '@/types/api'
+import {
+  InterviewType,
+  InterviewTypeCreate,
+  InterviewTypeUpdate,
+} from '@/types/api'
 
 const InterviewTypesPage: NextPage = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [editingInterviewType, setEditingInterviewType] =
+    useState<InterviewType | null>(null)
+
   const { data: interviewTypes, isLoading } = useInterviewTypes()
   const createInterviewType = useCreateInterviewType()
+  const updateInterviewType = useUpdateInterviewType()
+  const deleteInterviewType = useDeleteInterviewType()
 
   const handleCreate = async (data: InterviewTypeCreate) => {
     await createInterviewType.mutateAsync(data)
     setIsCreateOpen(false)
   }
+
+  const handleUpdate = async (data: InterviewTypeUpdate & { id: number }) => {
+    await updateInterviewType.mutateAsync(data)
+    setEditingInterviewType(null)
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm('Are you sure you want to delete this interview type?')) {
+      await deleteInterviewType.mutateAsync(id)
+    }
+  }
+
+  if (isLoading) return <div>Loading...</div>
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -74,14 +101,14 @@ const InterviewTypesPage: NextPage = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    // onClick={() => setEditingInterviewType(interviewType)}
+                    onClick={() => setEditingInterviewType(interviewType)}
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
-                    // onClick={() => handleDelete(interviewType.id)}
+                    onClick={() => handleDelete(interviewType.id)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -92,19 +119,24 @@ const InterviewTypesPage: NextPage = () => {
         </TableBody>
       </Table>
 
-      {/* <Dialog open={!!editingInterviewType} onOpenChange={() => setEditingInterviewType(null)}>
+      <Dialog
+        open={!!editingInterviewType}
+        onOpenChange={() => setEditingInterviewType(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Interview Type</DialogTitle>
           </DialogHeader>
           {editingInterviewType && (
-            <InterviewTypeForm 
-              interviewType={editingInterviewType} 
-              onSubmit={(data) => handleUpdate({ ...data, id: editingInterviewType.id })} 
+            <InterviewTypeForm
+              interviewType={editingInterviewType}
+              onSubmit={(data) =>
+                handleUpdate({ ...data, id: editingInterviewType.id })
+              }
             />
           )}
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </div>
   )
 }

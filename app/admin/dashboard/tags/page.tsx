@@ -12,27 +12,51 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useCreateTag, useTags } from '@/hooks/api/useTags'
-import { Tag, TagCreate } from '@/types/api'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  useCreateTag,
+  useDeleteTag,
+  useTags,
+  useUpdateTag,
+} from '@/hooks/api/useTags'
+import { Tag, TagCreate, TagUpdate } from '@/types/api'
 import { useState } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Plus } from 'lucide-react'
 const TagsPage: NextPage = () => {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [editingTag, setEditingTag] = useState<Tag | null>(null)
 
   const { data: tags, isLoading } = useTags()
 
-  const createTag = useCreateTag();
-    // const updateTag = useUpdateTag();
-    // const deleteTag = useDeleteTag();
-  
-    const handleCreate = async (data: TagCreate) => {
-      await createTag.mutateAsync(data);
-      setIsCreateOpen(false);
-    };
+  const createTag = useCreateTag()
+  const updateTag = useUpdateTag()
+  const deleteTag = useDeleteTag()
+
+  const handleCreate = async (data: TagCreate) => {
+    await createTag.mutateAsync(data)
+    setIsCreateOpen(false)
+  }
+
+  const handleUpdate = async (data: TagUpdate & { id: number }) => {
+    await updateTag.mutateAsync(data)
+    setEditingTag(null)
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm('Are you sure you want to delete this tag?')) {
+      await deleteTag.mutateAsync(id)
+    }
+  }
+
+  if (isLoading) return <div>Loading...</div>
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -83,14 +107,14 @@ const TagsPage: NextPage = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    // onClick={() => setEditingTag(tag)}
+                    onClick={() => setEditingTag(tag)}
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
-                    // onClick={() => handleDelete(tag.id)}
+                    onClick={() => handleDelete(tag.id)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -101,7 +125,7 @@ const TagsPage: NextPage = () => {
         </TableBody>
       </Table>
 
-      {/* <Dialog open={!!editingTag} onOpenChange={() => setEditingTag(null)}>
+      <Dialog open={!!editingTag} onOpenChange={() => setEditingTag(null)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Tag</DialogTitle>
@@ -113,27 +137,33 @@ const TagsPage: NextPage = () => {
             />
           )}
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </div>
   )
 }
 
 export default TagsPage
 
-function TagForm({ tag, onSubmit }: { tag?: Tag; onSubmit: (data: TagCreate) => void }) {
+function TagForm({
+  tag,
+  onSubmit,
+}: {
+  tag?: Tag
+  onSubmit: (data: TagCreate) => void
+}) {
   const [formData, setFormData] = useState({
     name: tag?.name || '',
     color: tag?.color || '#3b82f6',
-  });
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     const submitData = {
       ...formData,
       color: formData.color || undefined,
-    };
-    onSubmit(submitData);
-  };
+    }
+    onSubmit(submitData)
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -153,12 +183,16 @@ function TagForm({ tag, onSubmit }: { tag?: Tag; onSubmit: (data: TagCreate) => 
             id="color"
             type="color"
             value={formData.color}
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, color: e.target.value })
+            }
             className="w-16 h-10 p-1"
           />
           <Input
             value={formData.color}
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, color: e.target.value })
+            }
             placeholder="#3b82f6"
             className="flex-1"
           />
@@ -168,5 +202,5 @@ function TagForm({ tag, onSubmit }: { tag?: Tag; onSubmit: (data: TagCreate) => 
         {tag ? 'Update' : 'Create'} Tag
       </Button>
     </form>
-  );
+  )
 }

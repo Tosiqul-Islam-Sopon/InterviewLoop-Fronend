@@ -1,7 +1,13 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -12,22 +18,44 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useCreateJobRole, useJobRoles } from '@/hooks/api'
-import { JobRole, JobRoleCreate } from '@/types/api'
+import {
+  useCreateJobRole,
+  useDeleteJobRole,
+  useJobRoles,
+  useUpdateJobRole,
+} from '@/hooks/api'
+import { JobRole, JobRoleCreate, JobRoleUpdate } from '@/types/api'
 import { Plus, Edit, Trash2 } from 'lucide-react'
 import { NextPage } from 'next'
 import { useState } from 'react'
 
 const JobRolesPage: NextPage = () => {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [editingJobRole, setEditingJobRole] = useState<JobRole | null>(null)
   const { data: jobRoles, isLoading } = useJobRoles()
 
-  const createJobRole = useCreateJobRole();
+  const createJobRole = useCreateJobRole()
+  const updateJobRole = useUpdateJobRole()
+  const deleteJobRole = useDeleteJobRole()
 
   const handleCreate = async (data: JobRoleCreate) => {
-      await createJobRole.mutateAsync(data);
-      setIsCreateOpen(false);
-    };
+    await createJobRole.mutateAsync(data)
+    setIsCreateOpen(false)
+  }
+
+  const handleUpdate = async (data: JobRoleUpdate & { id: number }) => {
+    await updateJobRole.mutateAsync(data)
+    setEditingJobRole(null)
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm('Are you sure you want to delete this job role?')) {
+      await deleteJobRole.mutateAsync(id)
+    }
+  }
+
+  if (isLoading) return <div>Loading...</div>
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -68,14 +96,14 @@ const JobRolesPage: NextPage = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    // onClick={() => setEditingJobRole(jobRole)}
+                    onClick={() => setEditingJobRole(jobRole)}
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
-                    // onClick={() => handleDelete(jobRole.id)}
+                    onClick={() => handleDelete(jobRole.id)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -86,7 +114,7 @@ const JobRolesPage: NextPage = () => {
         </TableBody>
       </Table>
 
-      {/* <Dialog
+      <Dialog
         open={!!editingJobRole}
         onOpenChange={() => setEditingJobRole(null)}
       >
@@ -103,27 +131,33 @@ const JobRolesPage: NextPage = () => {
             />
           )}
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </div>
   )
 }
 
 export default JobRolesPage
 
-function JobRoleForm({ jobRole, onSubmit }: { jobRole?: JobRole; onSubmit: (data: JobRoleCreate) => void }) {
+function JobRoleForm({
+  jobRole,
+  onSubmit,
+}: {
+  jobRole?: JobRole
+  onSubmit: (data: JobRoleCreate) => void
+}) {
   const [formData, setFormData] = useState({
     title: jobRole?.title || '',
     level: jobRole?.level || '',
-  });
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     const submitData = {
       ...formData,
       level: formData.level || undefined,
-    };
-    onSubmit(submitData);
-  };
+    }
+    onSubmit(submitData)
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -149,5 +183,5 @@ function JobRoleForm({ jobRole, onSubmit }: { jobRole?: JobRole; onSubmit: (data
         {jobRole ? 'Update' : 'Create'} Job Role
       </Button>
     </form>
-  );
+  )
 }

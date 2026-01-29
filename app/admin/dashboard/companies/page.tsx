@@ -13,29 +13,60 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { useCompanies } from '@/hooks/api'
-import { useCreateCompany } from '@/hooks/api/useCompanies'
-import { Company, CompanyCreate } from '@/types/api'
+import {
+  useCreateCompany,
+  useDeleteCompany,
+  useUpdateCompany,
+} from '@/hooks/api/useCompanies'
+import { Company, CompanyCreate, CompanyUpdate } from '@/types/api'
 import { useState } from 'react'
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 
 const CompaniesPage: NextPage = () => {
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null)
+
   const { data: companies, isLoading } = useCompanies()
-  const createCompany = useCreateCompany();
+  const createCompany = useCreateCompany()
+  const updateCompany = useUpdateCompany()
+  const deleteCompany = useDeleteCompany()
 
   const handleCreate = async (data: CompanyCreate) => {
-      await createCompany.mutateAsync(data);
-      setIsCreateOpen(false);
-    };
+    await createCompany.mutateAsync(data)
+    setIsCreateOpen(false)
+  }
+
+  const handleUpdate = async (data: CompanyUpdate & { id: number }) => {
+    await updateCompany.mutateAsync(data)
+    setEditingCompany(null)
+  }
+
+  const handleDelete = async (id: number) => {
+    if (confirm('Are you sure you want to delete this company?')) {
+      await deleteCompany.mutateAsync(id)
+    }
+  }
+
+  if (isLoading) return <div>Loading...</div>
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Companies</h2>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="w-4 h-4 mr-2" />Add Company</Button>
+            <Button>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Company
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -85,14 +116,14 @@ const CompaniesPage: NextPage = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    // onClick={() => setEditingCompany(company)}
+                    onClick={() => setEditingCompany(company)}
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
-                    // onClick={() => handleDelete(company.id)}
+                    onClick={() => handleDelete(company.id)}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -103,26 +134,37 @@ const CompaniesPage: NextPage = () => {
         </TableBody>
       </Table>
 
-      {/* <Dialog open={!!editingCompany} onOpenChange={() => setEditingCompany(null)}>
+      <Dialog
+        open={!!editingCompany}
+        onOpenChange={() => setEditingCompany(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit Company</DialogTitle>
           </DialogHeader>
           {editingCompany && (
-            <CompanyForm 
-              company={editingCompany} 
-              onSubmit={(data) => handleUpdate({ ...data, id: editingCompany.id })} 
+            <CompanyForm
+              company={editingCompany}
+              onSubmit={(data) =>
+                handleUpdate({ ...data, id: editingCompany.id })
+              }
             />
           )}
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </div>
   )
 }
 
 export default CompaniesPage
 
-function CompanyForm({ company, onSubmit }: { company?: Company; onSubmit: (data: CompanyCreate) => void }) {
+function CompanyForm({
+  company,
+  onSubmit,
+}: {
+  company?: Company
+  onSubmit: (data: CompanyCreate) => void
+}) {
   const [formData, setFormData] = useState({
     name: company?.name || '',
     industry: company?.industry || '',
@@ -130,19 +172,19 @@ function CompanyForm({ company, onSubmit }: { company?: Company; onSubmit: (data
     website: company?.website || '',
     logo_url: company?.logo_url || '',
     is_active: company?.is_active ?? true,
-  });
+  })
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     const submitData = {
       ...formData,
       industry: formData.industry || undefined,
       location: formData.location || undefined,
       website: formData.website || undefined,
       logo_url: formData.logo_url || undefined,
-    };
-    onSubmit(submitData);
-  };
+    }
+    onSubmit(submitData)
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -160,7 +202,9 @@ function CompanyForm({ company, onSubmit }: { company?: Company; onSubmit: (data
         <Input
           id="industry"
           value={formData.industry}
-          onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, industry: e.target.value })
+          }
         />
       </div>
       <div>
@@ -168,7 +212,9 @@ function CompanyForm({ company, onSubmit }: { company?: Company; onSubmit: (data
         <Input
           id="location"
           value={formData.location}
-          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, location: e.target.value })
+          }
         />
       </div>
       <div>
@@ -177,7 +223,9 @@ function CompanyForm({ company, onSubmit }: { company?: Company; onSubmit: (data
           id="website"
           type="url"
           value={formData.website}
-          onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, website: e.target.value })
+          }
         />
       </div>
       <div>
@@ -186,7 +234,9 @@ function CompanyForm({ company, onSubmit }: { company?: Company; onSubmit: (data
           id="logo_url"
           type="url"
           value={formData.logo_url}
-          onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, logo_url: e.target.value })
+          }
         />
       </div>
       {company && (
@@ -195,7 +245,9 @@ function CompanyForm({ company, onSubmit }: { company?: Company; onSubmit: (data
             type="checkbox"
             id="is_active"
             checked={formData.is_active}
-            onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+            onChange={(e) =>
+              setFormData({ ...formData, is_active: e.target.checked })
+            }
           />
           <Label htmlFor="is_active">Active</Label>
         </div>
@@ -204,5 +256,5 @@ function CompanyForm({ company, onSubmit }: { company?: Company; onSubmit: (data
         {company ? 'Update' : 'Create'} Company
       </Button>
     </form>
-  );
+  )
 }
